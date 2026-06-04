@@ -1,173 +1,303 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YTSnap RawKnee</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RawKnee — YouTube App Opener</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: #070707;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-    .box {
-      width: 100%;
-      max-width: 520px;
-      border: 1px solid #222;
-      padding: 25px;
-      background: #111;
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.15);
-    }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top, rgba(255,0,0,0.22), transparent 35%),
+      linear-gradient(135deg, #050505, #111, #050505);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 22px;
+  }
 
-    h1 {
-      color: #ff3b3b;
-      font-size: 48px;
-      margin: 0 0 5px;
-      letter-spacing: 2px;
-    }
+  .wrap {
+    width: 100%;
+    max-width: 560px;
+    background: rgba(12,12,12,0.96);
+    border: 1px solid #2b2b2b;
+    border-radius: 22px;
+    padding: 30px;
+    box-shadow: 0 0 45px rgba(255,0,0,0.18);
+  }
 
-    p {
-      color: #aaa;
-      font-size: 13px;
-      letter-spacing: 2px;
-    }
+  .logo {
+    width: 100%;
+    max-width: 420px;
+    display: block;
+    margin: 0 auto 18px;
+  }
 
-    input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 15px;
-      margin-top: 20px;
-      background: #050505;
-      border: 1px solid #333;
-      color: white;
-      font-size: 15px;
-    }
+  .title {
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: #ff3333;
+    margin-bottom: 30px;
+    font-weight: bold;
+  }
 
-    button {
-      margin-top: 15px;
-      width: 100%;
-      padding: 15px;
-      background: #ff2d2d;
-      border: none;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-    }
+  .card {
+    background: #0a0a0a;
+    border: 1px solid #292929;
+    border-radius: 16px;
+    padding: 22px;
+  }
 
-    .result {
-      margin-top: 25px;
-      display: none;
-    }
+  label {
+    display: block;
+    font-size: 12px;
+    color: #999;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
 
-    .small {
-      font-size: 12px;
-      color: #777;
-      margin-top: 20px;
-      line-height: 1.5;
-    }
-  </style>
+  input {
+    width: 100%;
+    padding: 15px;
+    background: #050505;
+    color: white;
+    border: 1px solid #333;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  input:focus {
+    border-color: #ff2b2b;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 15px;
+    background: #ff2424;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+  .result {
+    margin-top: 22px;
+    display: none;
+  }
+
+  .result.show {
+    display: block;
+  }
+
+  .linkbox {
+    margin-top: 10px;
+    background: #050505;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 14px;
+    color: #ccc;
+    font-size: 13px;
+    word-break: break-all;
+    user-select: all;
+  }
+
+  .copy {
+    background: #222;
+  }
+
+  .error {
+    color: #ff3b3b;
+    font-size: 12px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .redirect {
+    display: none;
+    text-align: center;
+  }
+
+  .loader {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 5px solid #333;
+    border-top-color: #ff2424;
+    margin: 0 auto 22px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .redirect h1 {
+    font-size: 34px;
+    margin-bottom: 10px;
+  }
+
+  .redirect p {
+    color: #aaa;
+    font-size: 14px;
+  }
+
+  .redirect a {
+    color: #ff3333;
+  }
+</style>
 </head>
 
 <body>
-  <div class="box">
-    <h1>YTSNAP</h1>
-    <p>INSTANT YOUTUBE APP OPENER</p>
 
-    <input id="ytInput" placeholder="Paste YouTube link here" />
+<div class="wrap" id="main">
+  <img src="logo.png" class="logo" alt="RawKnee">
 
-    <button onclick="generateLink()">SNAP</button>
+  <div class="title">YOUTUBE APP LINK GENERATOR</div>
 
-    <div class="result" id="resultBox">
-      <p>YOUR INSTANT LINK</p>
-      <input id="outputLink" readonly />
-      <button onclick="copyLink()">COPY</button>
-    </div>
+  <div class="card">
+    <label>Paste YouTube Link</label>
+    <input id="urlInput" type="text" placeholder="Paste YouTube video / Shorts link here">
 
-    <div class="small">
-      Paste any YouTube video or Shorts link. This will generate a link that tries to open directly in the YouTube app.
+    <button onclick="generateLink()">GENERATE LINK</button>
+
+    <div class="error" id="error">Could not find a valid YouTube video ID.</div>
+
+    <div class="result" id="result">
+      <label>Your Story Link</label>
+      <div class="linkbox" id="finalLink"></div>
+      <button class="copy" onclick="copyLink()">COPY LINK</button>
     </div>
   </div>
+</div>
+
+<div class="wrap redirect" id="redirect">
+  <div class="loader"></div>
+  <h1>Opening YouTube</h1>
+  <p id="fallback"></p>
+</div>
 
 <script>
-function getVideoIdFromUrl(url) {
-  try {
-    let cleanUrl = url.trim();
+function extractVideoId(url) {
+  if (!url) return null;
 
-    if (cleanUrl.includes("youtu.be/")) {
-      return cleanUrl.split("youtu.be/")[1].split("?")[0].split("&")[0].split("/")[0];
-    }
+  if (/music\.youtube\.com/.test(url)) return null;
 
-    if (cleanUrl.includes("youtube.com/shorts/")) {
-      return cleanUrl.split("youtube.com/shorts/")[1].split("?")[0].split("&")[0].split("/")[0];
-    }
+  const patterns = [
+    /(?:youtube\.com\/watch\?(?:.*&)?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
+    /^([a-zA-Z0-9_-]{11})$/
+  ];
 
-    if (cleanUrl.includes("youtube.com/watch")) {
-      const urlObj = new URL(cleanUrl);
-      return urlObj.searchParams.get("v");
-    }
-
-    return cleanUrl;
-  } catch (e) {
-    return null;
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
   }
+
+  return null;
 }
 
 function generateLink() {
-  const input = document.getElementById("ytInput").value;
-  const videoId = getVideoIdFromUrl(input);
+  const input = document.getElementById("urlInput").value.trim();
+  const videoId = extractVideoId(input);
+  const error = document.getElementById("error");
+  const result = document.getElementById("result");
+  const finalLink = document.getElementById("finalLink");
 
   if (!videoId) {
-    alert("Please paste a valid YouTube link");
+    error.style.display = "block";
+    result.classList.remove("show");
     return;
   }
 
-  const finalLink = window.location.origin + window.location.pathname + "?v=" + videoId;
+  error.style.display = "none";
 
-  document.getElementById("outputLink").value = finalLink;
-  document.getElementById("resultBox").style.display = "block";
+  const baseUrl = window.location.href.split("?")[0];
+  const shareUrl = baseUrl + "?v=" + videoId;
+
+  finalLink.textContent = shareUrl;
+  result.classList.add("show");
 }
 
 function copyLink() {
-  const output = document.getElementById("outputLink");
-  output.select();
-  output.setSelectionRange(0, 99999);
-  navigator.clipboard.writeText(output.value);
-  alert("Copied!");
+  const text = document.getElementById("finalLink").textContent;
+  navigator.clipboard.writeText(text);
+  alert("Link copied!");
 }
 
-function autoOpenYouTube() {
+function openYouTube(videoId) {
+  document.getElementById("main").style.display = "none";
+  document.getElementById("redirect").style.display = "block";
+
+  const ytWeb = "https://www.youtube.com/watch?v=" + videoId;
+  document.getElementById("fallback").innerHTML =
+    'Not opening? <a href="' + ytWeb + '">Tap here</a>';
+
+  const ua = navigator.userAgent;
+
+  if (/iPhone|iPad|iPod/i.test(ua)) {
+    const iosLink = "youtube://www.youtube.com/watch?v=" + videoId;
+
+    window.location.href = iosLink;
+
+    let fallbackTimer = setTimeout(function () {
+      window.location.href = ytWeb;
+    }, 2500);
+
+    const cancelFallback = function () {
+      clearTimeout(fallbackTimer);
+    };
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) cancelFallback();
+    });
+
+    window.addEventListener("pagehide", cancelFallback);
+
+  } else if (/Android/i.test(ua)) {
+    const intentLink =
+      "intent://www.youtube.com/watch?v=" + videoId +
+      "#Intent;package=com.google.android.youtube;scheme=https;S.browser_fallback_url=" +
+      encodeURIComponent(ytWeb) +
+      ";end";
+
+    window.location.href = intentLink;
+
+  } else {
+    window.location.href = ytWeb;
+  }
+}
+
+(function init() {
   const params = new URLSearchParams(window.location.search);
   const videoId = params.get("v");
 
-  if (!videoId) return;
-
-  document.body.innerHTML = "";
-
-  const youtubeApp1 = "youtube://www.youtube.com/watch?v=" + videoId;
-  const youtubeApp2 = "vnd.youtube://www.youtube.com/watch?v=" + videoId;
-  const youtubeWeb = "https://www.youtube.com/watch?v=" + videoId;
-
-  window.location.href = youtubeApp1;
-
-  setTimeout(function () {
-    window.location.href = youtubeApp2;
-  }, 300);
-
-  setTimeout(function () {
-    window.location.href = youtubeWeb;
-  }, 1200);
-}
-
-autoOpenYouTube();
+  if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+    openYouTube(videoId);
+  }
+})();
 </script>
 
 </body>
