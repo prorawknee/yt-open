@@ -15,8 +15,9 @@
   body {
     min-height: 100vh;
     background:
-      radial-gradient(circle at top, rgba(255,0,0,0.22), transparent 35%),
-      linear-gradient(135deg, #050505, #111, #050505);
+      radial-gradient(circle at top left, rgba(255, 36, 36, 0.22), transparent 35%),
+      radial-gradient(circle at bottom right, rgba(255, 36, 36, 0.12), transparent 35%),
+      linear-gradient(135deg, #030303, #111, #050505);
     color: #fff;
     font-family: Arial, sans-serif;
     display: flex;
@@ -25,71 +26,93 @@
     padding: 22px;
   }
 
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events: none;
+  }
+
   .wrap {
+    position: relative;
     width: 100%;
-    max-width: 560px;
-    background: rgba(12,12,12,0.96);
-    border: 1px solid #2b2b2b;
-    border-radius: 22px;
-    padding: 30px;
-    box-shadow: 0 0 45px rgba(255,0,0,0.18);
+    max-width: 620px;
+    background: rgba(8,8,8,0.96);
+    border: 1px solid #282828;
+    border-radius: 24px;
+    padding: 34px;
+    box-shadow: 0 0 55px rgba(255,0,0,0.18);
   }
 
   .logo {
     width: 100%;
-    max-width: 420px;
+    max-width: 430px;
     display: block;
-    margin: 0 auto 18px;
+    margin: 0 auto 16px;
   }
 
   .title {
     text-align: center;
     font-size: 14px;
-    letter-spacing: 4px;
+    letter-spacing: 5px;
     color: #ff3333;
+    margin-bottom: 8px;
+    font-weight: 900;
+  }
+
+  .brandline {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #aaa;
     margin-bottom: 30px;
-    font-weight: bold;
+    text-transform: uppercase;
   }
 
   .card {
-    background: #0a0a0a;
+    background: #070707;
     border: 1px solid #292929;
-    border-radius: 16px;
-    padding: 22px;
+    border-radius: 18px;
+    padding: 24px;
   }
 
   label {
     display: block;
     font-size: 12px;
-    color: #999;
-    letter-spacing: 2px;
+    color: #aaa;
+    letter-spacing: 3px;
     margin-bottom: 12px;
     text-transform: uppercase;
   }
 
   input {
     width: 100%;
-    padding: 15px;
+    padding: 16px;
     background: #050505;
     color: white;
     border: 1px solid #333;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 11px;
+    font-size: 15px;
     outline: none;
   }
 
   input:focus {
     border-color: #ff2b2b;
+    box-shadow: 0 0 18px rgba(255, 36, 36, 0.15);
   }
 
   button {
     width: 100%;
     margin-top: 14px;
-    padding: 15px;
+    padding: 16px;
     background: #ff2424;
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 11px;
     font-size: 17px;
     font-weight: 900;
     letter-spacing: 2px;
@@ -101,7 +124,7 @@
   }
 
   .result {
-    margin-top: 22px;
+    margin-top: 24px;
     display: none;
   }
 
@@ -113,16 +136,36 @@
     margin-top: 10px;
     background: #050505;
     border: 1px solid #333;
-    border-radius: 10px;
-    padding: 14px;
-    color: #ccc;
-    font-size: 13px;
+    border-radius: 11px;
+    padding: 15px;
+    color: #eee;
+    font-size: 14px;
     word-break: break-all;
     user-select: all;
   }
 
+  .button-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .button-row button {
+    margin-top: 0;
+  }
+
   .copy {
     background: #222;
+  }
+
+  .test {
+    background: #ff2424;
+  }
+
+  .reset {
+    background: transparent;
+    border: 1px solid #444;
+    color: #ddd;
   }
 
   .error {
@@ -164,6 +207,42 @@
   .redirect a {
     color: #ff3333;
   }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff2424;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    box-shadow: 0 0 25px rgba(255,36,36,0.5);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    opacity: 1;
+  }
+
+  @media (max-width: 600px) {
+    .wrap {
+      padding: 24px;
+    }
+
+    .button-row {
+      flex-direction: column;
+    }
+
+    .logo {
+      max-width: 340px;
+    }
+  }
 </style>
 </head>
 
@@ -173,6 +252,7 @@
   <img src="logo.png" class="logo" alt="RawKnee">
 
   <div class="title">YOUTUBE APP LINK GENERATOR</div>
+  <div class="brandline">Made for RawKnee Stories</div>
 
   <div class="card">
     <label>Paste YouTube Link</label>
@@ -185,7 +265,13 @@
     <div class="result" id="result">
       <label>Your Story Link</label>
       <div class="linkbox" id="finalLink"></div>
-      <button class="copy" onclick="copyLink()">COPY LINK</button>
+
+      <div class="button-row">
+        <button class="copy" onclick="copyLink()">COPY LINK</button>
+        <button class="test" onclick="openTestLink()">OPEN TEST LINK</button>
+      </div>
+
+      <button class="reset" onclick="resetPage()">RESET</button>
     </div>
   </div>
 </div>
@@ -195,6 +281,8 @@
   <h1>Opening YouTube</h1>
   <p id="fallback"></p>
 </div>
+
+<div class="toast" id="toast">Link copied!</div>
 
 <script>
 function extractVideoId(url) {
@@ -234,7 +322,7 @@ function generateLink() {
 
   error.style.display = "none";
 
-  const baseUrl = window.location.href.split("?")[0];
+  const baseUrl = window.location.origin + window.location.pathname.split("?")[0];
   const shareUrl = baseUrl + "?v=" + videoId;
 
   finalLink.textContent = shareUrl;
@@ -243,8 +331,35 @@ function generateLink() {
 
 function copyLink() {
   const text = document.getElementById("finalLink").textContent;
-  navigator.clipboard.writeText(text);
-  alert("Link copied!");
+
+  navigator.clipboard.writeText(text).then(function () {
+    showToast("Link copied!");
+  });
+}
+
+function openTestLink() {
+  const link = document.getElementById("finalLink").textContent;
+
+  if (link) {
+    window.open(link, "_blank");
+  }
+}
+
+function resetPage() {
+  document.getElementById("urlInput").value = "";
+  document.getElementById("finalLink").textContent = "";
+  document.getElementById("result").classList.remove("show");
+  document.getElementById("error").style.display = "none";
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  setTimeout(function () {
+    toast.classList.remove("show");
+  }, 1800);
 }
 
 function openYouTube(videoId) {
