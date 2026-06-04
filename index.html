@@ -1,38 +1,174 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Opening YouTube...</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YTSnap RawKnee</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #070707;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .box {
+      width: 100%;
+      max-width: 520px;
+      border: 1px solid #222;
+      padding: 25px;
+      background: #111;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.15);
+    }
+
+    h1 {
+      color: #ff3b3b;
+      font-size: 48px;
+      margin: 0 0 5px;
+      letter-spacing: 2px;
+    }
+
+    p {
+      color: #aaa;
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 15px;
+      margin-top: 20px;
+      background: #050505;
+      border: 1px solid #333;
+      color: white;
+      font-size: 15px;
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 15px;
+      background: #ff2d2d;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .result {
+      margin-top: 25px;
+      display: none;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #777;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+  </style>
 </head>
+
 <body>
+  <div class="box">
+    <h1>YTSNAP</h1>
+    <p>INSTANT YOUTUBE APP OPENER</p>
+
+    <input id="ytInput" placeholder="Paste YouTube link here" />
+
+    <button onclick="generateLink()">SNAP</button>
+
+    <div class="result" id="resultBox">
+      <p>YOUR INSTANT LINK</p>
+      <input id="outputLink" readonly />
+      <button onclick="copyLink()">COPY</button>
+    </div>
+
+    <div class="small">
+      Paste any YouTube video or Shorts link. This will generate a link that tries to open directly in the YouTube app.
+    </div>
+  </div>
+
 <script>
-  function getVideoId() {
-    const params = new URLSearchParams(window.location.search);
-    const v = params.get("v");
+function getVideoIdFromUrl(url) {
+  try {
+    let cleanUrl = url.trim();
 
-    if (v) return v;
+    if (cleanUrl.includes("youtu.be/")) {
+      return cleanUrl.split("youtu.be/")[1].split("?")[0].split("&")[0].split("/")[0];
+    }
 
-    const path = window.location.pathname.replace("/", "");
-    if (path) return path;
+    if (cleanUrl.includes("youtube.com/shorts/")) {
+      return cleanUrl.split("youtube.com/shorts/")[1].split("?")[0].split("&")[0].split("/")[0];
+    }
 
+    if (cleanUrl.includes("youtube.com/watch")) {
+      const urlObj = new URL(cleanUrl);
+      return urlObj.searchParams.get("v");
+    }
+
+    return cleanUrl;
+  } catch (e) {
     return null;
   }
+}
 
-  const videoId = getVideoId();
+function generateLink() {
+  const input = document.getElementById("ytInput").value;
+  const videoId = getVideoIdFromUrl(input);
 
-  if (videoId) {
-    const appLink = "vnd.youtube://www.youtube.com/watch?v=" + videoId;
-    const webLink = "https://www.youtube.com/watch?v=" + videoId;
-
-    window.location.replace(appLink);
-
-    setTimeout(function () {
-      window.location.replace(webLink);
-    }, 800);
-  } else {
-    document.body.innerHTML = "No video found.";
+  if (!videoId) {
+    alert("Please paste a valid YouTube link");
+    return;
   }
+
+  const finalLink = window.location.origin + window.location.pathname + "?v=" + videoId;
+
+  document.getElementById("outputLink").value = finalLink;
+  document.getElementById("resultBox").style.display = "block";
+}
+
+function copyLink() {
+  const output = document.getElementById("outputLink");
+  output.select();
+  output.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(output.value);
+  alert("Copied!");
+}
+
+function autoOpenYouTube() {
+  const params = new URLSearchParams(window.location.search);
+  const videoId = params.get("v");
+
+  if (!videoId) return;
+
+  document.body.innerHTML = "";
+
+  const youtubeApp1 = "youtube://www.youtube.com/watch?v=" + videoId;
+  const youtubeApp2 = "vnd.youtube://www.youtube.com/watch?v=" + videoId;
+  const youtubeWeb = "https://www.youtube.com/watch?v=" + videoId;
+
+  window.location.href = youtubeApp1;
+
+  setTimeout(function () {
+    window.location.href = youtubeApp2;
+  }, 300);
+
+  setTimeout(function () {
+    window.location.href = youtubeWeb;
+  }, 1200);
+}
+
+autoOpenYouTube();
 </script>
+
 </body>
 </html>
