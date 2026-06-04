@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Opening YouTube...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<script>
+  function getVideoId() {
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get("v");
+
+    if (v) return v;
+
+    const path = window.location.pathname.replace("/", "");
+    if (path) return path;
+
+    return null;
+  }
+
+  const videoId = getVideoId();
+
+  if (videoId) {
+    const appLink = "vnd.youtube://www.youtube.com/watch?v=" + videoId;
+    const webLink = "https://www.youtube.com/watch?v=" + videoId;
+
+    window.location.replace(appLink);
+
+    setTimeout(function () {
+      window.location.replace(webLink);
+    }, 800);
+  } else {
+    document.body.innerHTML = "No video found.";
+  }
+</script>
+</body>
+</html>
